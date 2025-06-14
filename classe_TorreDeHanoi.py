@@ -2,31 +2,37 @@ from array import array
 from classe_Pilha import PilhaCheiaErro, PilhaVaziaErro, Pilha
 
 class Torre_de_Hanoi:
-    def __init__(self, discos):
-        self.__discos = discos
-        self.__passos = 0
-        self.torres = {
+    def __init__(self, discos:int):
+        self.__discos:int = discos
+        self.__passos:int = 0
+        self.torres:dict = {
             'A': Pilha(discos, 'i'),
             'B': Pilha(discos, 'i'),
             'C': Pilha(discos, 'i')
         }
+        print("\nEstado inicial:")
         self.haste_A()
         self.visualizar()
+        input("Pressione Enter para continuar...")  # Aguarda o Enter
+        print("\n-------------------------\n")
 
     def haste_A(self):
         """Empilha os discos na haste A (do maior para o menor)."""
         for disco in range(self.__discos, 0, -1):
             self.torres['A'].empilha(disco)
     
-    def mover_disco(self, origem: str, final: str):
+    def mover_disco(self, origem:str, final:str):
         """
         Move um disco entre hastes.
         
         origem: Haste de origem ('A', 'B', 'C')
         final: Haste de destino ('A', 'B', 'C')
         """
-        haste_origem = self.torres[origem]
-        haste_final = self.torres[final]
+        haste_origem:Pilha = self.torres[origem]
+        haste_final:Pilha = self.torres[final]
+
+        topo_origem = haste_origem.ver_topo()
+        topo_final = haste_final.ver_topo()
 
         if haste_origem.pilha_esta_vazia():
             raise PilhaVaziaErro(f"Haste {origem} vazia")
@@ -34,14 +40,14 @@ class Torre_de_Hanoi:
         if haste_final.pilha_esta_cheia():
             raise PilhaCheiaErro(f"Haste {final} cheia")
         
-        if (not haste_final.pilha_esta_vazia() and
-            haste_origem._Pilha__itens[-1] > haste_final._Pilha__itens[-1]):
-            raise ValueError('Disco maior não pode ficar em cima do menor')
+        if ( not (haste_final.pilha_esta_vazia()) and (topo_origem > topo_final) ):
+            raise ValueError('Disco maior não pode ficar em cima do disco menor!')
         
         disco = haste_origem.desempilha()
         haste_final.empilha(disco)
         self.__passos += 1
 
+        input("Pressione Enter para continuar...")  # Aguarda o Enter
         print(f"\nPosição {self.__passos} passos")
         self.visualizar()
 
@@ -58,11 +64,11 @@ class Torre_de_Hanoi:
         print(f"[ {' '.join(map(str, torre_C))} ] < pino destino")
         print()
 
-    def obter_discos(self, torre):
+    def obter_discos(self, torre:str):
         """Retorna os discos de uma torre em ordem do topo para a base"""
-        discos = []
-        temp_pilha = Pilha(self.__discos, 'i')
-        original_pilha = self.torres[torre]
+        discos:list = []
+        temp_pilha:Pilha = Pilha(self.__discos, 'i')
+        original_pilha:Pilha = self.torres[torre]
         
         # Desempilha tudo para obter a ordem correta
         while not original_pilha.pilha_esta_vazia():
@@ -76,13 +82,14 @@ class Torre_de_Hanoi:
         # Inverte para mostrar do topo para base
         return discos[::-1]
 
-    def resolver(self, n: int = None, origem: str = 'A', final: str = 'C', auxiliar: str = 'B'):
+    def resolver(self, n:int=0, origem:str='A', final:str='C', auxiliar:str='B'):
         """Resolve o jogo da Torre de Hanoi recursivamente"""
-        if n is None:
+        if n == 0:
             n = self.__discos
 
         if n == 1:
             self.mover_disco(origem, final)
+        
         else:
             self.resolver(n-1, origem, auxiliar, final)
             self.mover_disco(origem, final)
@@ -90,12 +97,13 @@ class Torre_de_Hanoi:
 
 # Exemplo de uso
 if __name__ == "__main__":
-    jogo = Torre_de_Hanoi(3)
+    jogo = Torre_de_Hanoi(4)
     
     print("Posição Inicial: 0 passos")
     jogo.visualizar()
 
     jogo.resolver()
 
+    print("\n-------------------------\n")
     print("\nEstado final:")
     jogo.visualizar()
